@@ -95,8 +95,8 @@ namespace detail
          */
         dominator_visitor(const Graph& g, const Vertex& entry,
             const IndexMap& indexMap, DomTreePredMap domTreePredMap)
-        : preds_(num_vertices(g))
-        , predsMap_(make_iterator_property_map(preds_.begin(), indexMap))
+        : pred_(num_vertices(g))
+        , predMap_(make_iterator_property_map(pred_.begin(), indexMap))
         , samedom_(num_vertices(g), graph_traits< Graph >::null_vertex())
         , buckets_(num_vertices(g))
         , bucketMap_(make_iterator_property_map(buckets_.begin(), indexMap))
@@ -143,14 +143,14 @@ namespace detail
                 if (get(dfnumMap, v) <= get(dfnumMap, n))
                     s2 = v;
                 else
-                    s2 = get(predsMap_, ancestor_with_lowest_semi_(v, dfnumMap))
+                    s2 = get(predMap_, ancestor_with_lowest_semi_(v, dfnumMap))
                              .semi;
 
                 if (get(dfnumMap, s2) < get(dfnumMap, s))
                     s = s2;
             }
-            auto& preds_of_n = get(predsMap_, n);
-            preds_of_n = {s, p, n};
+            auto& pred_of_n = get(predMap_, n);
+            pred_of_n = {s, p, n};
 
             // 2. Calculation of n's dominator is deferred until
             // the path from s to n has been linked into the forest
@@ -172,7 +172,7 @@ namespace detail
             {
                 const Vertex v(*buckItr);
                 const Vertex y(ancestor_with_lowest_semi_(v, dfnumMap));
-                if (get(predsMap_, y).semi == get(predsMap_, v).semi)
+                if (get(predMap_, y).semi == get(predMap_, v).semi)
                     put(domTreePredMap_, v, p);
                 else
                     put(samedomMap, v, y);
@@ -188,30 +188,30 @@ namespace detail
         const Vertex ancestor_with_lowest_semi_(
             const Vertex& v, const TimeMap& dfnumMap)
         {
-            const Vertex a(get(predsMap_, v).ancestor);
-            const auto& preds_of_a = get(predsMap_, a);
+            const Vertex a(get(predMap_, v).ancestor);
+            const auto& pred_of_a = get(predMap_, a);
 
-            auto& preds_of_v = get(predsMap_, v);
+            auto& pred_of_v = get(predMap_, v);
 
-            if (preds_of_a.ancestor != graph_traits< Graph >::null_vertex())
+            if (pred_of_a.ancestor != graph_traits< Graph >::null_vertex())
             {
                 const Vertex b(ancestor_with_lowest_semi_(a, dfnumMap));
-                const auto& preds_of_b = get(predsMap_, b);
+                const auto& pred_of_b = get(predMap_, b);
 
-                preds_of_v.ancestor = preds_of_a.ancestor;
+                pred_of_v.ancestor = pred_of_a.ancestor;
 
-                if (get(dfnumMap, preds_of_b.semi)
-                    < get(dfnumMap, get(predsMap_, preds_of_v.best).semi))
-                    preds_of_v.best = b;
+                if (get(dfnumMap, pred_of_b.semi)
+                    < get(dfnumMap, get(predMap_, pred_of_v.best).semi))
+                    pred_of_v.best = b;
             }
 
-            return preds_of_v.best;
+            return pred_of_v.best;
         }
 
-        std::vector< vertex_triple< Graph > > preds_;
+        std::vector< vertex_triple< Graph > > pred_;
         iterator_property_map< typename std::vector< vertex_triple< Graph > >::iterator,
             IndexMap >
-            predsMap_;
+            predMap_;
 
         std::vector< Vertex > samedom_;
         std::vector< std::vector< Vertex > > buckets_;
