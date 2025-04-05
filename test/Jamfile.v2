@@ -120,6 +120,7 @@ alias graph_test_regular :
     [ run king_ordering.cpp ]
     [ run matching_test.cpp ]
     [ run weighted_matching_test.cpp ]
+    [ run weighted_matching_test2.cpp ]
     [ run max_flow_test.cpp ]
     [ run boykov_kolmogorov_max_flow_test.cpp ]
     [ run cycle_ratio_tests.cpp /boost/graph//boost_graph : $(CYCLE_RATIO_INPUT_FILE) ]
