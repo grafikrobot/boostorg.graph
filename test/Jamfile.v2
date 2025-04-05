@@ -19,6 +19,8 @@ path-constant CYCLE_RATIO_INPUT_FILE : ./cycle_ratio_s382.90.dot ;
 
 path-constant METIS_INPUT_FILE : ./weighted_graph.gr ;
 
+path-constant WEIGHTED_MATCHING_INPUT_FILE : ./weighted_matching.dat ;
+
 alias graph_test_regular :
     # test_graphs will eventually defined a framework for testing the structure
     # and implementation of graph data structures and adaptors.
@@ -113,7 +115,7 @@ alias graph_test_regular :
     [ run cuthill_mckee_ordering.cpp ]
     [ run king_ordering.cpp ]
     [ run matching_test.cpp ]
-    [ run weighted_matching_test.cpp ]
+    [ run weighted_matching_test.cpp : $(WEIGHTED_MATCHING_INPUT_FILE) ]
     [ run weighted_matching_test2.cpp ]
     [ run max_flow_test.cpp ]
     [ run boykov_kolmogorov_max_flow_test.cpp ]
