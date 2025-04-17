@@ -48,8 +48,6 @@ constant boost_dependencies :
     /boost/xpressive//boost_xpressive ;
 
 project /boost/graph
-    : common-requirements
-        <include>include
     ;
 
 explicit
