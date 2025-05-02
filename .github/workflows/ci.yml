@@ -8,11 +8,11 @@ name: CI
 on: [ push, pull_request ]
 jobs:
   ubuntu:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        compiler: [ g++-14, clang++-19 ]
+        compiler: [ gcc-14, clang-19 ]
         cxxstd: [ 14, 17, 20, 23 ]
     steps:
       - uses: actions/checkout@master
@@ -23,8 +23,10 @@ jobs:
           commit-filter: '[skip ci];[ci skip];[CI SKIP];[SKIP CI];***CI SKIP***;***SKIP CI***;[windows];[Windows];[WINDOWS];[apple];[Apple];[APPLE]'
           commit-filter-separator: ';'
           fail-fast: true
-      - name: Set TOOLSET
-        run: echo ${{ matrix.compiler }} | awk '/^g/ { print "TOOLSET=gcc" } /^clang/ { print "TOOLSET=clang" }' >> $GITHUB_ENV
+      - name: Set ENV
+        run: |
+          echo ${{ matrix.compiler }} | awk '/^gcc/ { print "TOOLSET=gcc" } /^clang/ { print "TOOLSET=clang" }' >> $GITHUB_ENV
+          echo ${{ matrix.compiler }} | awk '/^gcc/ { gsub(/gcc/,"CXX=g++"); print; } /^clang/ { gsub(/clang/,"CXX=clang++"); print; }' >> $GITHUB_ENV
       - name: Install packages
         run: sudo apt install ${{ matrix.compiler }}
       - name: Checkout main boost
@@ -45,7 +47,7 @@ jobs:
         run: ./b2 headers
         working-directory: ../boost-root
       - name: Generate user config
-        run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} ;" > ~/user-config.jam'
+        run: 'echo "using $TOOLSET : : $CXX ;" > ~/user-config.jam'
         working-directory: ../boost-root
       - name: Config info
         run: ../../../b2 print_config_info toolset=$TOOLSET cxxstd=${{ matrix.cxxstd }}
